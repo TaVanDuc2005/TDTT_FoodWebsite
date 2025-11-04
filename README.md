@@ -58,12 +58,3 @@ từ đó gợi ý những lựa chọn **phù hợp – nhanh chóng – khách
 > “Xây dựng một hệ thống gợi ý món ăn thông minh, dễ dùng, và khách quan –  
 > kết hợp tư duy tính toán với trí tuệ nhân tạo để tối ưu trải nghiệm người dùng.”
 
----
-
-### 📁 **Tên thư mục / Repository**
-`Food_Recommendation_Web_CT`
-
----
-
-Bạn có muốn mình **thêm phần hình minh họa mô tả sơ đồ logic (ví dụ: TF-IDF → Cosine → Rank)** để chèn vào README cho nổi bật hơn không?  
-(Mình có thể giúp bạn vẽ sơ đồ đó bằng Markdown hoặc sơ đồ ảnh minh họa đẹp gọn.)
