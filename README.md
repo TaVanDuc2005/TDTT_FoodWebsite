@@ -5,7 +5,6 @@
 ![AI System](https://img.shields.io/badge/AI%2FML-Model-green?style=for-the-badge)
 ![Web Project](https://img.shields.io/badge/Web%20App-React%20%2B%20Python-blue?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Tr%E1%BA%A1ng%20th%C3%A1i-%C4%90ang%20ph%C3%A1t%20tri%E1%BB%83n-orange?style=for-the-badge)
-![License](https://img.shields.io/badge/Gi%E1%BA%A5y%20ph%C3%A9p-MIT-purple?style=for-the-badge)
 
 ---
 
