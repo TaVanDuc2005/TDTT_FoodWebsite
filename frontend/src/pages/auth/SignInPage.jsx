@@ -73,7 +73,7 @@ function SignInPage() {
         <div className="auth-card__left">
           <div className="auth-logo-box">
             <div className="auth-logo-circle"></div>
-            <p>Food Tour Gợi Ý Món Ăn</p>
+            <p>Logo</p>
           </div>
         </div>
 
