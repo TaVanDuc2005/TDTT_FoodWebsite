@@ -74,8 +74,8 @@ function SignUpPage() {
       <div className="auth-card auth-card--signup">
         <div className="auth-card__left">
           <div className="auth-logo-box">
-            <div className="auth-logo-circle">🍣</div>
-            <p>Khám phá quán ăn theo gu của bạn</p>
+            <div className="auth-logo-circle"></div>
+            <p>Logo</p>
           </div>
         </div>
 

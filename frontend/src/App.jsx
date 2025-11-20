@@ -1,4 +1,10 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import "./App.css";
+import "./index.css"
+import LandingPage from "./pages/LandingPage.jsx";
+import About from "./pages/About.jsx";
+import History from "./pages/History.jsx";
+
 import SignInPage from "./pages/auth/SignInPage.jsx";
 import SignUpPage from "./pages/auth/SignupPage.jsx";
 import HomePage from "./pages/auth/HomePage.jsx";
@@ -6,11 +12,24 @@ import HomePage from "./pages/auth/HomePage.jsx";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<SignInPage />} />
-      <Route path="/register" element={<SignUpPage />} />
+      {/* Trang chủ landing */}
+      <Route path="/" element={<LandingPage />} />
 
-      {/* route không tồn tại → về Home */}
+      {/* Các trang tĩnh */}
+      <Route path="/about" element={<About />} />
+      <Route path="/history" element={<History />} />
+
+      {/* Auth: tạo alias để dễ nhớ */}
+      <Route path="/login" element={<SignInPage />} />
+      <Route path="/signin" element={<SignInPage />} />
+
+      <Route path="/register" element={<SignUpPage />} />
+      <Route path="/signup" element={<SignUpPage />} />
+
+      {/* Home sau khi login thành công */}
+      <Route path="/home" element={<HomePage />} />
+
+      {/* Route không tồn tại */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
