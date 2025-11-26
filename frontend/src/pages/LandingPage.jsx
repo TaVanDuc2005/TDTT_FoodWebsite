@@ -54,9 +54,29 @@ const LandingPage = () => {
       {/* CSS ANIMATION */}
       <style>
         {`
+          /* Animation Gradient nền */
+          @keyframes gradientBG {
+             0% { background-position: 0% 50%; }
+             50% { background-position: 100% 50%; }
+             100% { background-position: 0% 50%; }
+          }
+
+          /* Animation Doodle chạy ngang */
           @keyframes moveRight { from { transform: translateX(-50%); } to { transform: translateX(0); } }
           @keyframes moveLeft { from { transform: translateX(0); } to { transform: translateX(-50%); } }
           
+          .animated-bg-container {
+             /* Gradient 4 màu: Cam Đậm - Vàng - Hồng - Cam Nhạt */
+             background: linear-gradient(-45deg, #FF9966, #FF5E62, #FFC043, #E65100);
+             background-size: 400% 400%;
+             animation: gradientBG 15s ease infinite; /* Đổi màu trong 15s */
+             
+             position: relative;
+             overflow: hidden;
+             padding: 80px 0;
+             color: white;
+          }
+
           .doodle-row {
             position: absolute;
             left: 0;
@@ -65,23 +85,23 @@ const LandingPage = () => {
             align-items: center;
             overflow: hidden;
             pointer-events: none;
-            /* Tăng độ trắng (opacity cao hơn) và độ mờ (blur) */
-            opacity: 0.25; 
+            /* Hiệu ứng bóng ma mờ ảo cho doodle */
+            opacity: 0.3; 
             filter: brightness(0) invert(1) blur(1px); 
           }
 
           .doodle-track {
             white-space: nowrap;
-            font-size: 45px; /* Chữ nhỏ lại xíu để chứa được nhiều dòng */
+            font-size: 45px;
             padding-right: 50px;
           }
         `}
       </style>
 
-      {/* SEARCH SECTION WITH DOODLE BACKGROUND */}
-      <div className="search-section-bg" style={{position: 'relative', overflow: 'hidden'}}>
+      {/* SEARCH SECTION VỚI GRADIENT & DOODLE */}
+      <div className="animated-bg-container">
         
-        {/* --- DÒNG 1: Chạy sang Phải, Chậm --- */}
+        {/* --- DÒNG 1: Chạy sang Phải --- */}
         <div className="doodle-row" style={{ top: '5%' }}>
            <div className="doodle-track" style={{ animation: 'moveRight 80s linear infinite' }}>
               {foodIcons} {foodIcons} {foodIcons}
@@ -91,8 +111,8 @@ const LandingPage = () => {
            </div>
         </div>
 
-        {/* --- DÒNG 2: Chạy sang Trái, Nhanh hơn xíu (So le) --- */}
-        <div className="doodle-row" style={{ top: '35%', opacity: 0.2 }}>
+        {/* --- DÒNG 2: Chạy sang Trái (So le) --- */}
+        <div className="doodle-row" style={{ top: '35%', opacity: 0.25 }}>
            <div className="doodle-track" style={{ animation: 'moveLeft 60s linear infinite' }}>
               {foodIcons} {foodIcons} {foodIcons}
            </div>
@@ -101,7 +121,7 @@ const LandingPage = () => {
            </div>
         </div>
 
-        {/* --- DÒNG 3: Chạy sang Phải, Bình thường --- */}
+        {/* --- DÒNG 3: Chạy sang Phải --- */}
         <div className="doodle-row" style={{ top: '65%' }}>
            <div className="doodle-track" style={{ animation: 'moveRight 70s linear infinite' }}>
               {foodIcons} {foodIcons} {foodIcons}
@@ -111,14 +131,14 @@ const LandingPage = () => {
            </div>
         </div>
 
-        {/* NỘI DUNG CHÍNH (Đè lên trên Doodle) */}
+        {/* NỘI DUNG CHÍNH */}
         <div className="container search-content" style={{position: 'relative', zIndex: 10}}>
             <p style={{
                 color: '#fff', fontSize: '20px', fontWeight: '700', fontStyle: 'italic',
                 textShadow: '0 2px 4px rgba(0,0,0,0.8)', 
-                marginBottom: '25px', background: 'rgba(0,0,0,0.4)', 
+                marginBottom: '25px', background: 'rgba(255,255,255,0.2)', 
                 display: 'inline-block', padding: '10px 25px', borderRadius: '30px',
-                backdropFilter: 'blur(3px)'
+                backdropFilter: 'blur(5px)', border: '1px solid rgba(255,255,255,0.3)'
             }}>
                 "{slogan}"
             </p>
