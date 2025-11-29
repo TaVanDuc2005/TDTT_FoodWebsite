@@ -11,7 +11,7 @@ const genToken = (userId) => {
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
+    user: process.env.EMAIL_CHEWZ,
     pass: process.env.EMAIL_PASS,
   },
 });
@@ -137,7 +137,7 @@ exports.forgotPassword = async (req, res) => {
     // Gửi email thật bằng nodemailer
     try {
       await transporter.sendMail({
-        from: `"Chewz App" <${process.env.EMAIL_USER}>`,
+        from: `"Chewz App" <${process.env.EMAIL_CHEWZ}>`,
         to: user.email,
         subject: "Đặt lại mật khẩu Chewz",
         html: `
