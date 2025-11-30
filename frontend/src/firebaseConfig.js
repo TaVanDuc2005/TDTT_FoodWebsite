@@ -1,7 +1,9 @@
-// frontend/src/firebaseConfig.js
+// Import các hàm cần thiết từ Firebase SDK
 import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
+// --- THAY CÁI NÀY BẰNG MÃ CỦA BÀ LẤY TRÊN FIREBASE CONSOLE ---
 const firebaseConfig = {
   apiKey: "AIzaSyATJxwJqMYx9iVjNgVnyl2bRTjElG1jmF0",
   authDomain: "tdtt-food-website.firebaseapp.com",
@@ -12,9 +14,10 @@ const firebaseConfig = {
   measurementId: "G-1WGL3ZJLB1",
 };
 
-// Khởi tạo app Firebase
+// Khởi tạo Firebase
 const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
 
-// Khởi tạo Auth và Provider Google
-export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
+export { db, auth, googleProvider };
