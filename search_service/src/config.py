@@ -8,5 +8,6 @@ class Settings:
     DB_NAME = "tdtt"
     COLLECTION_NAME = "restaurants"
     MODEL_NAME = "BAAI/bge-m3"
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyD1slPB7WLs1NzFzCQ3B6uZ7Osw9zYntc4")
 
 settings = Settings()

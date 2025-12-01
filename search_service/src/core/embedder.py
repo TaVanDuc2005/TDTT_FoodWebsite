@@ -1,5 +1,5 @@
 """
-embedder.py - Clean version without query enhancement
+embedder.py
 """
 
 from sentence_transformers import SentenceTransformer
@@ -171,7 +171,6 @@ class RestaurantEmbedder:
         if not query or not isinstance(query, str):
             return np.zeros(self.embedding_dim, dtype=np.float32)
 
-        # OPTIONAL: Bạn có thể cải thiện query tại đây (nếu muốn)
         # ví dụ thêm keyword "best restaurant", "good food", ...
         cleaned_query = query.strip()
 

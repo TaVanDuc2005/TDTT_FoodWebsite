@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, BeforeValidator
-from typing import List, Optional, Annotated
+from typing import List, Optional, Annotated, Dict, Any
 
 # Xử lý ObjectId của Mongo
 PyObjectId = Annotated[str, BeforeValidator(str)]
@@ -37,3 +37,13 @@ class RestaurantResult(BaseModel):
 
     class Config:
         populate_by_name = True
+
+class RouteStep(BaseModel):
+    step_index: int
+    intent: Dict[str, Any] # Chứa {"keyword": "...", "district": "..."}
+    candidates: List[RestaurantResult] # Danh sách quán gợi ý cho bước này
+
+#Schemas trả về của Advanced Search
+class MultiStepSearchResponse(BaseModel):
+    original_query: str
+    steps: List[RouteStep]

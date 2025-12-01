@@ -62,6 +62,7 @@ class HybridFoodFinder:
             # 2. Xử lý MENU (List -> String)
             # Biến ["Món A", "Món B"] thành "Món A, Món B"
             menu_items = item.get('menu', [])
+            row['menu'] = menu_items
             if isinstance(menu_items, list):
                 row['menu_flat'] = ", ".join(menu_items) 
             else:
@@ -137,10 +138,11 @@ class HybridFoodFinder:
     def search(
         self,
         query: str,
+        district: str = None,
         top_k: int = 15,
         alpha: float = 0.6, # Trọng số: 0.6 cho Semantic (AI), 0.4 cho TF-IDF (Từ khóa)
         center: tuple = None, # (lat, lon)
-        radius_km: float = 5.0
+        radius_km: float = 0
     ):
         if self.df.empty: return []
         if not query.strip(): return self.df.head(top_k).to_dict('records')
@@ -172,9 +174,17 @@ class HybridFoodFinder:
         results['tfidf_score'] = tfidf_scores
 
         # ---------------------------------------------------------
-        # BƯỚC 3: LỌC THEO BÁN KÍNH (NẾU CÓ)
+        # BƯỚC 3: LỌC
         # ---------------------------------------------------------
-        if center:
+        if district:
+            # Tìm những dòng mà địa chỉ chứa tên quận (không phân biệt hoa thường)
+            # na=False: Bỏ qua nếu địa chỉ bị trống
+            mask_district = results['address'].str.contains(district, case=False, na=False)
+
+            if mask_district.any():
+                results = results[mask_district]
+
+        if center and radius_km > 0:
             def fast_distance(row):
                 # Vì data đã clean ở bước load, lat/lon đảm bảo là số
                 return geodesic(center, (row['lat'], row['lon'])).km <= radius_km

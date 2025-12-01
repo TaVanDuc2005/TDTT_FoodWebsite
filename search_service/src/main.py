@@ -13,7 +13,8 @@ app.add_middleware(
 )
 
 # Gắn Router vào App
-app.include_router(search_api.router) # <-- Đăng ký ở đây
+app.include_router(search_api.router_v1) # <-- Đăng ký ở đây
+app.include_router(search_api.router_v2)
 # app.include_router(admin.router)
 
 @app.get("/")
