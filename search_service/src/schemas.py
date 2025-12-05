@@ -4,6 +4,10 @@ from typing import List, Optional, Annotated, Dict, Any
 # Xử lý ObjectId của Mongo
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
+class MenuItem(BaseModel):
+    name: str
+    price: float = 0.0
+
 class LocationModel(BaseModel):
     type: str = "Point"
     coordinates: List[float]
@@ -23,7 +27,7 @@ class RestaurantResult(BaseModel):
     avg_rating: float
     
     # Các trường bổ sung
-    menu: List[str] = []
+    menu: List[MenuItem] = []
     avatar_url: Optional[str] = None
     
     # Điểm số thuật toán (Quan trọng để debug xem tại sao quán này lên top)
@@ -47,3 +51,15 @@ class RouteStep(BaseModel):
 class MultiStepSearchResponse(BaseModel):
     original_query: str
     steps: List[RouteStep]
+
+class RoutePlan(BaseModel):
+    route_id: str
+    total_score: float
+    total_distance: float
+    stops: List[RestaurantResult] # Danh sách các quán trong lộ trình này
+
+# Cập nhật Response tổng
+class MultiStepSearchResponse(BaseModel):
+    original_query: str
+    steps: List[RouteStep] # Danh sách ứng viên cho từng bước (để user tự chọn nếu muốn)
+    suggested_routes: List[RoutePlan] = [] # 👇 THÊM: Top 3 lộ trình tốt nhất do AI ghép

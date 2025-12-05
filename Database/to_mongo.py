@@ -2,6 +2,7 @@ import pandas as pd
 from pymongo import MongoClient
 import certifi
 import numpy as np
+import re
 
 URL = "mongodb+srv://lnqhoc2407_db_user:admin123456@cluster0.zh3u1zk.mongodb.net/?appName=Cluster0"
 DB_NAME = "tdtt"
@@ -29,7 +30,7 @@ RES_COL_MAP = {
     'diem_Giá cả': 'score_price',
     
     # Optional (Nếu có)
-    'avatar_url': 'avatar_url'
+    'url_anh': 'image_url'
 }
 
 REV_COL_MAP = {
@@ -50,12 +51,69 @@ def clean_float(val):
     except (ValueError, TypeError):
         return 0.0
 
+def parse_menu_item(item_str):
+    """
+    Input: "Cơm gà chiên nước mắm (40.000đ)"
+    Output: {"name": "Cơm gà chiên nước mắm", "price": 40000}
+    """
+    item_str = item_str.strip()
+    if not item_str: return None
+
+    price = 0
+    name = item_str
+
+    match_num = re.search(r'(\d{1,3}(?:[.,]\d{3})+)', item_str)
+        
+    if match_num:
+        clean_num = match_num.group(1).replace('.', '').replace(',', '')
+        try:
+            price = int(clean_num)
+        except:
+            pass
+
+    return {
+        "name": name, 
+        "price": price
+    }
+
 def process_menu(val):
     """Xử lý menu tách bằng dấu gạch đứng |"""
     if pd.isna(val) or val == "nan" or str(val).strip() == "":
         return []
+    menu = []
     items = str(val).split('|')
-    return [item.strip() for item in items if item.strip() != ""]
+    for item in items:
+        parsed = parse_menu_item(item)
+        menu.append(parsed)
+    return menu
+
+def clean_opening_hours(val):
+    """
+    Input: "Đang mở cửa  00:01 - 23:59"
+    Output: "00:01 - 23:59"
+    
+    Input: "07:00 - 11:00 | 17:00 - 22:00" (Nhiều ca)
+    Output: "07:00 - 11:00 | 17:00 - 22:00"
+    """
+    if pd.isna(val) or val == "nan" or str(val).strip() == "":
+        return ""
+    
+    val = str(val)
+    
+    # Regex giải thích:
+    # \d{1,2}:\d{2}  -> Tìm giờ:phút (VD: 7:00 hoặc 07:00)
+    # \s*-\s* -> Tìm dấu gạch ngang (có thể có khoảng trắng bao quanh)
+    # \d{1,2}:\d{2}  -> Tìm giờ:phút kết thúc
+    pattern = r'(\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2})'
+    
+    # Tìm tất cả các khung giờ (đề phòng quán nghỉ trưa có 2 khung giờ)
+    matches = re.findall(pattern, val)
+    
+    if matches:
+        # Nối các khung giờ lại (nếu có nhiều ca) bằng dấu " | "
+        return " | ".join(matches)
+    
+    return "" # Không tìm thấy giờ thì trả về rỗng
 
 def migrate_data():
     print("⏳ [1/4] Đang đọc file CSV...")
@@ -113,19 +171,19 @@ def migrate_data():
         doc = {
             "name": clean(row.get('name'), "Không tên"),
             "address": clean(row.get('address')),
-            "opening_hours": clean(row.get('opening_hours')),
+            "opening_hours": clean_opening_hours(row.get('opening_hours')),
             "price_range": clean(row.get('price_range')),
+            "location": geo_location,
             
             # Xử lý Menu từ cột 'menu_raw'
             "menu": process_menu(row.get('menu_raw')),
+            "reviews": review_map.get(url, []),
             
             "source_url": url,
+            "image_url": clean(row.get('image_url')),
             "avg_rating": clean_float(row.get('avg_rating')),
-            "avatar_url": clean(row.get('avatar_url')),
 
-            "location": geo_location,
             "scores": scores_obj,
-            "reviews": review_map.get(url, [])
         }
         
         documents.append(doc)

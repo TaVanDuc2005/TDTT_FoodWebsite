@@ -14,6 +14,7 @@ yarn-error.log*
 
 # --- BACKEND (Python) ---
 # Môi trường ảo (Cực quan trọng)
+.csv
 venv/
 env/
 .env

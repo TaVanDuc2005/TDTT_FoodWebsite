@@ -59,12 +59,24 @@ class HybridFoodFinder:
                 'avg_rating': item.get('avg_rating', 0.0),
             }
 
-            # 2. Xử lý MENU (List -> String)
-            # Biến ["Món A", "Món B"] thành "Món A, Món B"
+            # 2. Xử lý MENU
             menu_items = item.get('menu', [])
-            row['menu'] = menu_items
+            row['menu'] = menu_items # Giữ nguyên list object để trả về API (Frontend cần cái này)
+            
             if isinstance(menu_items, list):
-                row['menu_flat'] = ", ".join(menu_items) 
+                # 👇 FIX BUG: Lọc lấy tên món ra danh sách riêng
+                menu_names = []
+                for m in menu_items:
+                    if isinstance(m, dict):
+                        # Nếu là object {name: "Cơm", price: 30k} -> Lấy "Cơm"
+                        name = m.get('name', '')
+                        if name: menu_names.append(str(name))
+                    elif isinstance(m, str):
+                        # Nếu là string "Cơm" (data cũ) -> Lấy luôn
+                        menu_names.append(m)
+                
+                # Giờ thì join thoải mái vì toàn là string
+                row['menu_flat'] = ", ".join(menu_names) 
             else:
                 row['menu_flat'] = ""
 
@@ -140,67 +152,101 @@ class HybridFoodFinder:
         query: str,
         district: str = None,
         top_k: int = 15,
-        alpha: float = 0.6, # Trọng số: 0.6 cho Semantic (AI), 0.4 cho TF-IDF (Từ khóa)
-        center: tuple = None, # (lat, lon)
-        radius_km: float = 0
+        alpha: float = 0.6,
+        center: tuple = None,
+        radius_km: float = 0,
+        
+        # 👇 THAM SỐ MỚI: Trọng số (Mặc định nếu không truyền)
+        weight_sim: float = 0.7,       # Mặc định ưu tiên nội dung (0.7)
+        weight_dist: float = 0.3       # Mặc định ưu tiên khoảng cách (0.3)
     ):
         if self.df.empty: return []
         if not query.strip(): return self.df.head(top_k).to_dict('records')
 
         # ---------------------------------------------------------
-        # BƯỚC 1: TÍNH ĐIỂM CHO TOÀN BỘ DATA (Full Matrix)
+        # BƯỚC 1: TÍNH ĐIỂM RELEVANCE (NỘI DUNG)
         # ---------------------------------------------------------
-        
-        # Tính Semantic Score
         query_emb = self.embedder.embed_query(query)
         sem_scores = np.dot(self.semantic_matrix, query_emb)
 
-        # Tính TF-IDF Score
         query_tfidf = self.vectorizer.transform([query.lower()])
         tfidf_scores = cosine_similarity(query_tfidf, self.tfidf_matrix).flatten()
 
-        # Tính điểm tổng hợp
-        final_scores = (alpha * sem_scores) + ((1 - alpha) * tfidf_scores)
+        # Điểm nội dung (0 -> 1)
+        relevance_scores = (alpha * sem_scores) + ((1 - alpha) * tfidf_scores)
 
         # ---------------------------------------------------------
-        # BƯỚC 2: GÁN ĐIỂM VÀO DATAFRAME BẢN SAO
+        # BƯỚC 2: TẠO BẢNG TẠM
         # ---------------------------------------------------------
-        # Tạo bản sao để không ảnh hưởng data gốc
         results = self.df.copy()
-        
-        # Gán điểm vào (Lúc này độ dài khớp 100% nên không lỗi)
-        results['score'] = final_scores
+        results['relevance_score'] = relevance_scores
         results['semantic_score'] = sem_scores
         results['tfidf_score'] = tfidf_scores
+        
+        # Khởi tạo điểm khoảng cách mặc định là 0
+        results['distance_score'] = 0.0
+        results['distance_km'] = 0.0
 
         # ---------------------------------------------------------
-        # BƯỚC 3: LỌC
+        # BƯỚC 3: LỌC QUẬN (Hard Filter)
         # ---------------------------------------------------------
         if district:
-            # Tìm những dòng mà địa chỉ chứa tên quận (không phân biệt hoa thường)
-            # na=False: Bỏ qua nếu địa chỉ bị trống
             mask_district = results['address'].str.contains(district, case=False, na=False)
-
             if mask_district.any():
                 results = results[mask_district]
+            # Nếu lọc quận xong mà rỗng thì có thể return [] hoặc bỏ qua lọc tùy logic bạn muốn
 
-        if center and radius_km > 0:
-            def fast_distance(row):
-                # Vì data đã clean ở bước load, lat/lon đảm bảo là số
-                return geodesic(center, (row['lat'], row['lon'])).km <= radius_km
-
-            # Lọc bớt những quán ở xa
-            mask = results.apply(fast_distance, axis=1)
-            results = results[mask]
+        # ---------------------------------------------------------
+        # BƯỚC 4: TÍNH ĐIỂM KHOẢNG CÁCH & LỌC BÁN KÍNH
+        # ---------------------------------------------------------
+        if center and radius_km > 0 and not results.empty:
+            lat_center, lon_center = center
+            
+            # Tính khoảng cách thực tế (km)
+            results['distance_km'] = results.apply(
+                lambda row: geodesic((row['lat'], row['lon']), (lat_center, lon_center)).km, 
+                axis=1
+            )
+            
+            # Lọc cứng: Loại bỏ quán ngoài bán kính
+            results = results[results['distance_km'] <= radius_km]
             
             if results.empty: return []
 
-        # ---------------------------------------------------------
-        # BƯỚC 4: SẮP XẾP & LẤY TOP K
-        # ---------------------------------------------------------
-        results = results.sort_values('score', ascending=False).head(top_k)
+            # 👇 TÍNH ĐIỂM KHOẢNG CÁCH (0 -> 1)
+            # Công thức: 1 - (Khoảng cách / Bán kính max)
+            # Càng gần càng cao (1.0), càng xa càng thấp (0.0)
+            results['distance_score'] = 1 - (results['distance_km'] / radius_km)
+            
+            # Đảm bảo không âm (phòng trường hợp sai số nhỏ)
+            results['distance_score'] = results['distance_score'].clip(lower=0)
         
-        # Chuyển ObjectId sang string để trả về JSON không lỗi
+        elif center:
+             # Nếu có center nhưng không lọc bán kính (radius_km=0),
+             # ta vẫn có thể tính khoảng cách để sort, nhưng không lọc bỏ.
+             # Tuy nhiên để đơn giản, nếu radius=0 ta coi như distance_score = 0.5 (trung lập)
+             results['distance_score'] = 0.5
+
+        # ---------------------------------------------------------
+        # BƯỚC 5: TÍNH ĐIỂM TỔNG HỢP (FINAL SCORE)
+        # ---------------------------------------------------------
+        
+        # Chuẩn hóa tổng trọng số về 1 (để tránh điểm bị lố)
+        total_w = weight_sim + weight_dist
+        if total_w == 0: total_w = 1 # Tránh chia cho 0
+        
+        w_s = weight_sim / total_w
+        w_d = weight_dist / total_w
+
+        # Công thức: Final = (w_s * Relevance) + (w_d * Distance)
+        # Nếu không có tính khoảng cách (distance_score=0), điểm sẽ phụ thuộc hoàn toàn vào relevance
+        results['final_score'] = (w_s * results['relevance_score']) + (w_d * results['distance_score'])
+
+        # ---------------------------------------------------------
+        # BƯỚC 6: SẮP XẾP & TRẢ VỀ
+        # ---------------------------------------------------------
+        results = results.sort_values('final_score', ascending=False).head(top_k)
+        
         results['_id'] = results['_id'].astype(str)
         
         return results.to_dict('records')

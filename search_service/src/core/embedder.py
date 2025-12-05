@@ -4,6 +4,7 @@ embedder.py
 
 from sentence_transformers import SentenceTransformer
 import numpy as np
+import pandas as pd
 import pickle
 import os
 
@@ -46,42 +47,84 @@ class RestaurantEmbedder:
     def _prepare_text(self, row):
         parts = []
         
-        # 1. Thông tin cơ bản (QUAN TRỌNG NHẤT -> ĐỂ ĐẦU TIÊN)
-        name = row.get('name', '')
-        # Nhấn mạnh tên quán bằng cách lặp lại
-        parts.append(f"Restaurant Name: {name}. {name}") 
-        
-        # 2. Xử lý Menu (TĂNG TRỌNG SỐ Ở ĐÂY)
-        menu = row.get('menu_flat', '')
-        parts.append(f"Main Menu: {menu}")
-        parts.append(f"Signature Dishes: {menu}") 
+        # Hàm phụ trợ lấy giá trị an toàn
+        def get_safe(key, default):
+            val = row.get(key, default)
+            
+            # 1. Nếu là List hoặc Dict -> Trả về luôn (Không check isna)
+            if isinstance(val, (list, dict)):
+                return val
+            
+            # 2. Nếu là None -> Trả về default
+            if val is None:
+                return default
+                
+            # 3. Chỉ check pd.isna với số hoặc chuỗi
+            try:
+                if pd.isna(val):
+                    return default
+            except (ValueError, TypeError):
+                # Nếu check isna mà vẫn lỗi (do kiểu lạ) thì coi như nó hợp lệ
+                return val
+                
+            return val
 
-        # 3. Địa chỉ (Ít quan trọng hơn -> Để sau)
-        address = row.get('address', '')
+        # 1. Thông tin cơ bản
+        name = get_safe('name', '')
+        address = get_safe('address', '')
+        parts.append(f"Name: {name}")
         parts.append(f"Address: {address}")
         
-        # 4. Cuisine
+        # 2. Cuisine
         category_guess = self.extract_cuisine(name)
         parts.append(f"Category: {category_guess}")
 
-        # 5. Reviews (Quan trọng nhưng dài, để cuối để không làm loãng Menu)
-        review = row.get('reviews_flat', '')
-        parts.append(f"Reviews: {review[:2000]}")
-
-        # 6. Xử lý Scores (Tín hiệu chất lượng)
-        scores = row.get('scores', {})
-        parts.append(f"Address: {address}")
+        # 3. Xử lý Menu (FIX LỖI: Trích xuất tên món ăn từ Dict)
+        menu_items = get_safe('menu', [])
+        
+        if isinstance(menu_items, list) and menu_items:
+            menu_names = []
+            for item in menu_items[:30]: # Lấy 30 món đầu
+                if isinstance(item, dict):
+                    # Nếu là object {name: "Phở", price: 30} -> Lấy tên
+                    m_name = item.get('name', '')
+                    if m_name: menu_names.append(str(m_name))
+                elif isinstance(item, str):
+                    # Nếu là string "Phở" -> Lấy luôn
+                    menu_names.append(item)
+                else:
+                    # Fallback
+                    menu_names.append(str(item))
             
-        if scores.get('score_service', 0) >= 8.0:
-            parts.append("Excellent service")
-        if scores.get('score_space', 0) >= 8.0:
-            parts.append("Beautiful space nice view")
-        if scores.get('score_price', 0) >= 8.0:
-            parts.append("Good price reasonable")
+            # Chỉ join khi danh sách không rỗng
+            if menu_names:
+                menu_str = ", ".join(menu_names)
+                parts.append(f"Menu: {menu_str}")
+                parts.append(f"Signature Dishes: {menu_str}")
 
-        # Nối tất cả lại thành 1 đoạn văn
-        final_text = ". ".join(parts)
-        return final_text
+        # 4. Xử lý Reviews (Cũng cần sửa tương tự để an toàn)
+        reviews = get_safe('reviews', [])
+        if isinstance(reviews, list) and reviews:
+            review_texts = []
+            for r in reviews[:10]:
+                if isinstance(r, dict):
+                    content = r.get('content', '')
+                    if content: review_texts.append(str(content))
+                elif isinstance(r, str):
+                    review_texts.append(r)
+            
+            if review_texts:
+                full_review = " ".join(review_texts)
+                parts.append(f"Reviews: {full_review[:2000]}")
+
+        # 5. Scores (Giữ nguyên)
+        scores = get_safe('scores', {})
+        if isinstance(scores, dict):
+            if scores.get('score_service', 0) >= 8.0: parts.append("Excellent service")
+            if scores.get('score_space', 0) >= 8.0: parts.append("Beautiful space nice view")
+            if scores.get('score_price', 0) >= 8.0: parts.append("Good price reasonable")
+
+        return ". ".join(parts)
     
     def embeddings(self, df, cache_path='models/embeddings_cache.pkl'):
         """

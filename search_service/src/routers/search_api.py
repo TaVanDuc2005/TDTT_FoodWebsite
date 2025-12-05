@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Query
 from typing import Optional, List
+import traceback    
 
 # Import bộ não xử lý
 from src.core.search_engine import HybridFoodFinder
 from src.core.nlp_parser import IntentParser
+from src.core.route_optimizer import RouteOptimizer
 from src.schemas import RestaurantResult, RouteStep, MultiStepSearchResponse
 
 # Tạo Router
@@ -17,9 +19,10 @@ print("⏳ Đang khởi động Search Engine...")
 try:
     engine = HybridFoodFinder() # Tự động load từ MongoDB
     nlp = IntentParser()
-    # planner = RoutePlanner(engine)
+    optimizer = RouteOptimizer()
 except Exception as e:
     print(f"❌ Lỗi khởi tạo Search Engine: {e}")
+    traceback.print_exc()
     engine = None
     nlp = None
     planner = None
@@ -64,33 +67,41 @@ def search_restaurants(
 # ==========================================
 @router_v2.get("/", response_model=MultiStepSearchResponse)
 def search_restaurants_v2(
-    q: str = Query(..., description="Từ khóa tìm kiếm (VD: Cơm tấm)"),
-    lat: Optional[float] = Query(10.7769, description="Vĩ độ hiện tại của User"),
-    lon: Optional[float] = Query(106.7009, description="Kinh độ hiện tại của User"),
-    radius: float = Query(0, description="Bán kính tìm kiếm (km)"),
-    alpha: float = Query(0.6, description="Trọng số AI (0.0 -> 1.0)"),
-    top_k: int = 5
+    q: str = Query(..., description="Từ khóa tìm kiếm (VD: Cơm tấm rồi cafe)"),
+    lat: float = 10.7769, # Bỏ Optional, để mặc định HCM
+    lon: float = 106.7009,
+    radius: float = 5.0,
+    alpha: float = 0.6,
+    top_k: int = 5 
 ):
+    # 1. Kiểm tra Engine
     if not engine or not nlp:
-        return {"original_query": q, "steps": []}
+        return {"original_query": q, "steps": [], "suggested_routes": []}
     
+    # 2. NLP Parse
     intents = nlp.parse(q)
-    print(f"🤖 Intents: {intents}")
-
+    
     steps_result = []
 
-    #Route Optimize sẽ được gọi ở đây
+    # 3. Tìm Candidates cho từng bước
     for idx, intent in enumerate(intents):
         keyword = intent.get("keyword", "")
         district = intent.get("district")
+        
+        # Lấy trọng số từ NLP (nếu có)
+        w_sim = intent.get("weight_sim", 0.6)
+        w_dist = intent.get("weight_dist", 0.2)
 
         candidates = engine.search(
             query=keyword,
             district=district,
-            top_k=top_k,
+            top_k=top_k, 
             center=(lat, lon),
             radius_km=radius,
-            alpha=alpha
+            alpha=alpha,
+            # Truyền trọng số vào search engine để lọc candidate tốt nhất
+            weight_sim=w_sim,
+            weight_dist=w_dist
         )
 
         step_data = RouteStep(
@@ -100,7 +111,15 @@ def search_restaurants_v2(
         )
         steps_result.append(step_data)
     
+    # 4. TỐI ƯU LỘ TRÌNH (Ghép các candidates lại)
+    suggested_routes = optimizer.optimize(
+        steps_data=steps_result, 
+        user_location=(lat, lon) # Truyền vị trí user để tính đường đi từ điểm xuất phát
+    )
+
+    # 5. Trả về kết quả
     return {
         "original_query": q,
-        "steps": steps_result
+        "steps": steps_result,          # Danh sách ứng viên (để hiện từng tab)
+        "suggested_routes": suggested_routes # Lộ trình tối ưu (để hiện map)
     }
