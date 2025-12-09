@@ -15,6 +15,7 @@ import RestaurantsPage from "./pages/RestaurantsPage"; // 🆕 THÊM IMPORT
 
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   const { user } = useAuth(); // Lấy thông tin user
@@ -57,9 +58,15 @@ function App() {
       <Route path="/about" element={<About />} />
       <Route path="/history" element={<History />} />
       <Route path="/category/:slug" element={<CategoryPage />} />
+      <Route
+        path="/profile"
+        element={user ? <ProfilePage /> : <Navigate to="/login" />}
+      />
 
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+      {/* Route 404 (Nếu người dùng gõ link bậy bạ) */}
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }
