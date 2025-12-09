@@ -165,7 +165,7 @@ export default function RestaurantDetail({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6 overflow-auto">
+    <div className="fixed inset-0 z-[50] flex items-center justify-center p-6 overflow-auto">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       <div className="relative bg-white w-[90%] max-w-3xl rounded shadow-lg p-6 max-h-[90vh] overflow-auto">

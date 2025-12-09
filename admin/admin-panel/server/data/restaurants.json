@@ -21,18 +21,20 @@
     "opening": "13:00 - 2:10",
     "rating": 9.5,
     "for": "",
-    "priceRange": "1.500.000VND"
+    "priceRange": "1.500.000VND",
+    "visible": false
   },
   {
     "id": 6,
-    "image": "/src/assets/masu.png",
-    "name": "hi",
-    "tags": "lau",
-    "description": "rất đẹp",
-    "address": "31 Phan Huy Ích",
-    "opening": "13:00",
+    "image": "/src/assets/logo.png",
+    "name": "kimchi",
+    "tags": "",
+    "description": "ngon",
+    "address": "33 phan huy ich",
+    "opening": "",
     "rating": null,
     "for": "",
-    "priceRange": "1.500.000VND"
+    "priceRange": "",
+    "visible": false
   }
 ]

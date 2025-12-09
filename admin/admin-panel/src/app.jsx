@@ -3,11 +3,20 @@ import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 import Restaurants from "./pages/Restaurants";
 import Categories from "./pages/Categories";
+import Reviews from "./pages/Reviews";
+import ReviewViolations from "./pages/ReviewViolations";
+import ReviewsDeleted from "./pages/ReviewsDeleted";
+import Users from "./pages/Users";
 
 function routeForHash(hash) {
   if (!hash) return { name: "home" };
   if (hash.startsWith("#/restaurants")) return { name: "restaurants" };
   if (hash.startsWith("#/categories")) return { name: "categories" };
+  if (hash.startsWith("#/reviews/violations"))
+    return { name: "review-violations" };
+  if (hash.startsWith("#/reviews/deleted")) return { name: "reviews-deleted" };
+  if (hash.startsWith("#/reviews")) return { name: "reviews" };
+  if (hash.startsWith("#/users")) return { name: "users" };
   return { name: "home" };
 }
 
@@ -30,6 +39,14 @@ export default function App() {
             <Restaurants />
           ) : route.name === "categories" ? (
             <Categories />
+          ) : route.name === "reviews" ? (
+            <Reviews />
+          ) : route.name === "review-violations" ? (
+            <ReviewViolations />
+          ) : route.name === "reviews-deleted" ? (
+            <ReviewsDeleted />
+          ) : route.name === "users" ? (
+            <Users />
           ) : (
             <div />
           )}

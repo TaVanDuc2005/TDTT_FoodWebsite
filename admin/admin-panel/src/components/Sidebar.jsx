@@ -58,6 +58,14 @@ export default function Sidebar() {
           </a>,
         ]}
       />
+      <Section
+        title="QUẢN LÝ NGƯỜI DÙNG"
+        items={[
+          <a className="block" key="users-all" href="#/users">
+            Xem thông tin
+          </a>,
+        ]}
+      />
     </aside>
   );
 }

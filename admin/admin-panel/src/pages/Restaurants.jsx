@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import RestaurantDetail from "../components/RestaurantDetail";
-import AddRestaurant from "../components/AddRestaurant";
+import AddRestaurantForm from "../components/AddRestaurantForm";
 
 const StatCard = ({ title, value }) => (
   <div className="w-56 h-40 bg-sky-100 rounded-lg border border-sky-300 flex flex-col items-center justify-center">
@@ -335,14 +335,14 @@ export default function Restaurants() {
             </tbody>
           </table>
         </div>
-
-        {showAdd && (
-          <AddRestaurant
-            onClose={() => setShowAdd(false)}
-            onCreate={handleCreate}
-          />
-        )}
       </div>
+
+      {showAdd && (
+        <AddRestaurantForm
+          onClose={() => setShowAdd(false)}
+          onSave={handleCreate}
+        />
+      )}
     </div>
   );
 }
