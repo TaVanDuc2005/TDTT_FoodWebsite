@@ -12,6 +12,7 @@ import SignupPage from "./pages/auth/SignupPage";
 import RestaurantDetailPage from "./pages/RestaurantDetailPage";
 import CategoryPage from "./pages/CategoryPage";
 import RestaurantsPage from "./pages/RestaurantsPage";
+import AdvancedSearchPage from "./pages/AdvancedSearchPage";
 
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -64,6 +65,7 @@ function App() {
 
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+      <Route path="/search-advanced" element={<AdvancedSearchPage />} />
 
       {/* Route 404 (Nếu người dùng gõ link bậy bạ) */}
       <Route path="*" element={<Navigate to="/" />} />
