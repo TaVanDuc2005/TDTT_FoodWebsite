@@ -9,7 +9,7 @@ const RestaurantCard = ({ restaurant }) => {
     address,
     opening_hours,
     price_range,
-    image_url,
+    avatar_url,
     avg_rating,
     category,
     scores,
@@ -92,7 +92,7 @@ const RestaurantCard = ({ restaurant }) => {
         >
           <img
             src={
-              image_url ||
+              avatar_url ||
               "https://placehold.co/400x300/E0E0E0/999?text=No+Image"
             }
             alt={name}
