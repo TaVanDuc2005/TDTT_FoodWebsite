@@ -18,6 +18,7 @@ import CategoryPage from './pages/CategoryPage';
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ProfilePage from './pages/ProfilePage';
+import SearchPage from './pages/SearchPage';
 
 function App() {
   const { user, loading } = useAuth(); // Thêm loading nếu context có support để tránh flash
@@ -48,6 +49,7 @@ function App() {
       {/* 5. CÁC TRANG CẦN ĐĂNG NHẬP (PROTECTED) */}
       <Route path="/history" element={user ? <History /> : <Navigate to="/login" />} />
       <Route path="/profile" element={user ? <ProfilePage /> : <Navigate to="/login" />} />
+      <Route path="/search" element={<SearchPage />} />
       
       {/* Route 404 (Nếu người dùng gõ link bậy bạ) */}
       <Route path="*" element={<Navigate to="/" />} />

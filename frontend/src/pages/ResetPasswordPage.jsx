@@ -20,7 +20,7 @@ const ResetPasswordPage = () => {
     setMessage('');
 
     if (password !== confirmPassword) {
-      setError('Hai mật khẩu không khớp. Bà check lại kỹ nha!');
+      setError('Hai mật khẩu không khớp. Bạn check lại kỹ nha!');
       return;
     }
 

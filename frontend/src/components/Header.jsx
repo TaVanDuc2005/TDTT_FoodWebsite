@@ -1,101 +1,91 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../App.css';
-import logolmg from '../assets/logo-horizontal.svg'; // Check lại đường dẫn ảnh logo nha
+
+// 👇 1. NHỚ MỞ LẠI DÒNG NÀY NHA BÀ
+import logolmg from '../assets/logo-horizontal.svg'; 
 
 const Header = () => {
   const location = useLocation();
-  const { user } = useAuth(); // Lấy thông tin user từ Context
+  const { user } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Hàm check active để tô đậm menu đang đứng
   const isActive = (path) => location.pathname === path ? 'nav-item active' : 'nav-item';
+  const closeMenu = () => setIsMobileMenuOpen(false);
 
   return (
     <header className="header">
       <div className="container top-bar">
         
-        {/* === LOGO === */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center' }}>
-          <img
-            src={logolmg}
-            alt="Chewz Logo"
-            style={{ height: '50px', objectFit: 'contain' }} 
+        {/* 👇 2. ĐÃ TRẢ LẠI LOGO ẢNH CHO BÀ Ở ĐÂY */}
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', zIndex: 101 }} onClick={closeMenu}>
+          <img 
+            src={logolmg} 
+            alt="Chewz Logo" 
+            style={{ height: '45px', objectFit: 'contain' }} 
           />
         </Link>
 
-        {/* === MENU GIỮA === */}
-        <nav className="nav-menu">
-          <Link to="/" className={isActive('/')}>TRANG CHỦ</Link>
+        {/* MOBILE TOGGLE */}
+        <div className="mobile-toggle" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          <span style={{ fontSize: '28px', lineHeight: '1', cursor: 'pointer' }}>
+            {isMobileMenuOpen ? "✕" : "☰"}
+          </span>
+        </div>
+
+        {/* MENU CHÍNH */}
+        <nav className={`nav-menu ${isMobileMenuOpen ? 'open' : ''}`}>
+          <Link to="/" className={isActive('/')} onClick={closeMenu}>TRANG CHỦ</Link>
+          <Link to="/planner" className={isActive('/planner')} onClick={closeMenu}>PLANNER</Link>
+          <Link to="/history" className={isActive('/history')} onClick={closeMenu}>LỊCH SỬ</Link>
+          <Link to="/about" className={isActive('/about')} onClick={closeMenu}>VỀ CHÚNG TÔI</Link>
           
-          {/* Link này có thể dẫn đến trang Search hoặc để tạm # */}
-          <Link to="/search" className={isActive('/search')}>TÌM KIẾM</Link>
-          
-          <Link to="/history" className={isActive('/history')}>LỊCH SỬ</Link>
-          <Link to="/about" className={isActive('/about')}>VỀ CHÚNG TÔI</Link>
+          {/* MOBILE AUTH */}
+          <div className="mobile-auth-block">
+             {!user ? (
+               <>
+                 <Link to="/login" className="mobile-auth-link" onClick={closeMenu}>Đăng nhập</Link>
+                 <Link to="/register" className="mobile-auth-link highlight" onClick={closeMenu}>Đăng ký</Link>
+               </>
+             ) : (
+               <Link to="/profile" className="mobile-auth-link" onClick={closeMenu}>
+                 👤 {user.name} (Hồ sơ)
+               </Link>
+             )}
+          </div>
         </nav>
 
-        {/* === KHU VỰC USER (BÊN PHẢI) === */}
-        <div className="auth-buttons">
+        {/* DESKTOP AUTH */}
+        <div className="auth-buttons desktop-only">
           {user ? (
-            // --- TRƯỜNG HỢP 1: ĐÃ ĐĂNG NHẬP ---
             <Link 
               to="/profile" 
               className="user-profile-link" 
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                textDecoration: 'none', 
-                gap: '12px',
-                padding: '5px 10px',
-                borderRadius: '30px',
-                backgroundColor: '#f8f9fa', // Nền nhẹ cho nổi bật
-                border: '1px solid #eee'
+              style={{
+                display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none',
+                padding: '5px 12px', borderRadius: '30px',
+                background: '#fff0e6', border: '1px solid #ffccb3'
               }}
             >
-               {/* Tên User */}
-               <span style={{ color: '#333', fontWeight: '600', fontSize: '14px' }}>
-                 Hi, {user.name || "Bạn mình"}
+               <span style={{color: '#d35400', fontWeight: '700', fontSize: '14px'}}>
+                 {user.name || "Khách hàng"}
                </span>
-               
-               {/* Avatar Tròn */}
                <img 
-                 src={user.avatar || "https://placehold.co/150"} 
-                 alt="Avatar" 
-                 style={{ 
-                   width: '36px', 
-                   height: '36px', 
-                   borderRadius: '50%', 
-                   objectFit: 'cover',
-                   border: '2px solid #fff',
-                   boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
-                 }}
+                 src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=ff6b35&color=fff`} 
+                 alt="Ava" 
+                 className="header-avatar"
+                 style={{ width: '35px', height: '35px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white' }}
+                 onError={(e) => {e.target.src = "https://placehold.co/40"}} 
                />
             </Link>
           ) : (
-            // --- TRƯỜNG HỢP 2: CHƯA ĐĂNG NHẬP ---
             <div style={{ display: 'flex', gap: '10px' }}>
-              <Link to="/login" className="btn-login" style={{ textDecoration: 'none', color: '#333', fontWeight: '600', padding: '8px 16px' }}>
-                Đăng nhập
-              </Link>
-              <Link 
-                to="/register" 
-                className="btn-register"
-                style={{
-                  backgroundColor: '#ff6b35',
-                  color: 'white',
-                  padding: '8px 20px',
-                  borderRadius: '20px',
-                  textDecoration: 'none',
-                  fontWeight: '600'
-                }}
-              >
-                Đăng ký
-              </Link>
+              <Link to="/login" className="btn-login">Đăng nhập</Link>
+              <Link to="/register" className="btn-register">Đăng ký</Link>
             </div>
           )}
         </div>
-
       </div>
     </header>
   );
