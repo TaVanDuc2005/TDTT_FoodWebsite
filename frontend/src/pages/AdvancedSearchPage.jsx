@@ -318,7 +318,20 @@ const AdvancedSearchPage = () => {
       setLoading(true);
 
       // Call HuggingFace search API
-      const res = await searchAPI.advanced({ q: keyword.trim() });
+      const params = {
+        q: keyword.trim(),
+        top_k: 9999, // để backend truyền lên HF
+      };
+
+      // nếu sau này bạn muốn dùng luôn tọa độ của người dùng
+      if (userLocation) {
+        params.lat = userLocation.lat;
+        params.lon = userLocation.lon;
+        params.radius = 0; // hoặc 5, 10km tùy ý
+        params.alpha = 0.6;
+      }
+
+      const res = await searchAPI.advanced(params);
       const searchResults = res.data || [];
 
       setRestaurants(searchResults);
@@ -865,7 +878,7 @@ const AdvancedSearchPage = () => {
                       marginBottom: "10px",
                     }}
                   >
-                    ⭐ Đánh giá tối thiểu
+                    ⭐ Đánh giá tối thiểu (0–10)
                   </label>
                   <div
                     style={{
@@ -874,7 +887,7 @@ const AdvancedSearchPage = () => {
                       gap: "8px",
                     }}
                   >
-                    {[0, 3, 3.5, 4, 4.5].map((rating) => (
+                    {[0, 5, 7, 8, 9].map((rating) => (
                       <label
                         key={rating}
                         style={{
@@ -905,7 +918,7 @@ const AdvancedSearchPage = () => {
                           style={{ cursor: "pointer" }}
                         />
                         <span style={{ fontSize: "14px" }}>
-                          {rating === 0 ? "Tất cả" : `${rating}+ sao`}
+                          {rating === 0 ? "Tất cả" : `${rating}+ điểm`}
                         </span>
                       </label>
                     ))}
