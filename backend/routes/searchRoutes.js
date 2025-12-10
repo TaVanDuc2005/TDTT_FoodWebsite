@@ -13,22 +13,31 @@ const HF_SEARCH_URL =
  */
 router.get("/advanced", async (req, res) => {
   try {
-    const { q } = req.query;
+    const { q, top_k, lat, lon, radius, alpha } = req.query;
 
     if (!q || q.trim() === "") {
       return res.status(400).json({ message: "Thiếu từ khóa q" });
     }
 
-    // Gửi request sang service HuggingFace
+    // build params gửi lên HF
+    const hfParams = {
+      q,
+      top_k: top_k || 9999, // 👈 mặc định lấy 9999 nếu FE không truyền
+    };
+
+    // nếu sau này muốn dùng geo thì FE chỉ cần truyền lat/lon/radius/alpha
+    if (lat) hfParams.lat = lat;
+    if (lon) hfParams.lon = lon;
+    if (radius) hfParams.radius = radius;
+    if (alpha) hfParams.alpha = alpha;
+
     const hfResponse = await axios.get(HF_SEARCH_URL, {
-      params: { q }, // hiện tại chỉ cần q, sau này thêm filter thì nhét vào đây
+      params: hfParams,
       timeout: 10000,
     });
 
     const results = hfResponse.data;
 
-    // Ở đây result đã là danh sách nhà hàng từ MongoDB (từ service Python)
-    // Bạn có thể xử lý thêm nếu muốn (sort lại, filter thêm, ...) rồi trả về
     return res.json({
       success: true,
       total: results.length,
