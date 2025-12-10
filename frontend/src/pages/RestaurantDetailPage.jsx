@@ -43,7 +43,7 @@ const RestaurantDetailPage = () => {
           open_time: data.opening_hours || "Đang cập nhật",
           price_range: data.price_range || "Đang cập nhật",
           img:
-            data.image_url ||
+            data.avatar_url ||
             "https://placehold.co/800x400/FFF3E0/E65100?text=Restaurant",
           description:
             data.reviews?.[0]?.comment ||

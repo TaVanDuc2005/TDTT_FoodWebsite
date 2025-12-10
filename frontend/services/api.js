@@ -15,17 +15,6 @@ const api = axios.create({
 
 // Restaurant API Service
 export const restaurantAPI = {
-  /**
-   * Lấy danh sách nhà hàng với filter và phân trang
-   * @param {Object} params - Query parameters
-   * @param {number} params.page - Trang hiện tại
-   * @param {number} params.limit - Số lượng items mỗi trang
-   * @param {string} params.category - Danh mục lọc
-   * @param {string} params.search - Từ khóa tìm kiếm
-   * @param {number} params.minRating - Rating tối thiểu
-   * @param {string} params.sortBy - Sắp xếp theo field
-   * @param {string} params.order - Thứ tự sắp xếp (asc/desc)
-   */
   getAll: async (params = {}) => {
     try {
       const response = await api.get("/restaurants", { params });
@@ -36,10 +25,6 @@ export const restaurantAPI = {
     }
   },
 
-  /**
-   * Lấy chi tiết một nhà hàng
-   * @param {string} id - ID của nhà hàng
-   */
   getById: async (id) => {
     try {
       const response = await api.get(`/restaurants/${id}`);
@@ -50,10 +35,6 @@ export const restaurantAPI = {
     }
   },
 
-  /**
-   * Lấy danh sách nhà hàng nổi bật
-   * @param {number} limit - Số lượng nhà hàng lấy về
-   */
   getFeatured: async (limit = 50) => {
     try {
       const response = await api.get("/restaurants/featured", {
@@ -66,9 +47,6 @@ export const restaurantAPI = {
     }
   },
 
-  /**
-   * Lấy thống kê danh mục
-   */
   getCategoryStats: async () => {
     try {
       const response = await api.get("/restaurants/categories/stats");
@@ -79,10 +57,6 @@ export const restaurantAPI = {
     }
   },
 
-  /**
-   * Tạo nhà hàng mới (Admin)
-   * @param {Object} data - Dữ liệu nhà hàng
-   */
   create: async (data) => {
     try {
       const response = await api.post("/restaurants", data);
@@ -93,11 +67,6 @@ export const restaurantAPI = {
     }
   },
 
-  /**
-   * Cập nhật nhà hàng (Admin)
-   * @param {string} id - ID của nhà hàng
-   * @param {Object} data - Dữ liệu cập nhật
-   */
   update: async (id, data) => {
     try {
       const response = await api.put(`/restaurants/${id}`, data);
@@ -108,10 +77,6 @@ export const restaurantAPI = {
     }
   },
 
-  /**
-   * Xóa nhà hàng (Admin)
-   * @param {string} id - ID của nhà hàng
-   */
   delete: async (id) => {
     try {
       const response = await api.delete(`/restaurants/${id}`);
@@ -123,5 +88,20 @@ export const restaurantAPI = {
   },
 };
 
-// Export default api instance để có thể dùng cho các API khác
+// ----------------------
+// Search API Service
+// ----------------------
+export const searchAPI = {
+  advanced: async (params = {}) => {
+    try {
+      const response = await api.get("/search/advanced", { params });
+      return response.data; // { success, total, data }
+    } catch (error) {
+      console.error("Error searching restaurants:", error);
+      throw error;
+    }
+  },
+};
+
+// Export default api instance
 export default api;

@@ -2,6 +2,9 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import "leaflet/dist/leaflet.css";
+import "./map/leafletFix";
+import FoodTourPage from "./pages/FoodTourPage";
 
 import "./App.css";
 import HomePage from "./pages/HomePage"; // 🔁 Dùng làm trang chủ duy nhất
@@ -12,6 +15,7 @@ import SignupPage from "./pages/auth/SignupPage";
 import RestaurantDetailPage from "./pages/RestaurantDetailPage";
 import CategoryPage from "./pages/CategoryPage";
 import RestaurantsPage from "./pages/RestaurantsPage";
+import AdvancedSearchPage from "./pages/AdvancedSearchPage";
 
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -64,6 +68,9 @@ function App() {
 
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+      <Route path="/search-advanced" element={<AdvancedSearchPage />} />
+
+      <Route path="/food-tour" element={<FoodTourPage />} />
 
       {/* Route 404 (Nếu người dùng gõ link bậy bạ) */}
       <Route path="*" element={<Navigate to="/" />} />
