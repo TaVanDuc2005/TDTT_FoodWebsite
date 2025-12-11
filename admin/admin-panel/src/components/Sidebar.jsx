@@ -1,71 +1,96 @@
 import React, { useState } from "react";
+import { 
+  Store, 
+  List, 
+  MessageSquare, 
+  AlertTriangle, 
+  Trash2, 
+  Users, 
+  ChevronDown, 
+  ChevronRight,
+  LayoutDashboard
+} from "lucide-react";
 
-function Section({ title, items }) {
-  const [open, setOpen] = useState(true);
+function SidebarItem({ href, icon: Icon, label, active }) {
+  const isHashMatch = (href) => {
+    if (href === "#/" && (!window.location.hash || window.location.hash === "#/")) return true;
+    return window.location.hash.startsWith(href);
+  };
+  
+  const isActive = active || isHashMatch(href);
+
   return (
-    <div className="mb-6">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between font-bold text-sky-900"
-      >
-        <span>{title}</span>
-        <span
-          className={`transform transition-transform ${
-            open ? "rotate-0" : "rotate-90"
-          }`}
-        >
-          ▾
-        </span>
-      </button>
-      {open && (
-        <ul className="mt-2 space-y-1 text-sm ml-2 text-slate-800">
-          {items.map((it) => (
-            <li key={it} className="py-0.5 hover:text-sky-700 cursor-pointer">
-              {it}
-            </li>
-          ))}
-        </ul>
-      )}
+    <a
+      href={href}
+      className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+        isActive
+          ? "bg-slate-800 text-white"
+          : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+      }`}
+    >
+      <Icon className={`mr-3 h-5 w-5 flex-shrink-0 ${isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-white"}`} aria-hidden="true" />
+      {label}
+    </a>
+  );
+}
+
+function Section({ title, children }) {
+  return (
+    <div className="pt-6">
+      <h3 className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+        {title}
+      </h3>
+      <div className="mt-2 space-y-1">
+        {children}
+      </div>
     </div>
   );
 }
 
 export default function Sidebar() {
   return (
-    <aside className="w-72 bg-sky-100 min-h-[calc(100vh-4rem)] p-6">
-      <Section
-        title="QUẢN LÝ NHÀ HÀNG"
-        items={[
-          <a className="block" key="all" href="#/restaurants">
-            Tất cả
-          </a>,
-          <a className="block" key="cats" href="#/categories">
-            Danh mục
-          </a>,
-        ]}
-      />
-      <Section
-        title="QUẢN LÝ ĐÁNH GIÁ"
-        items={[
-          <a className="block" key="all-r" href="#/reviews">
-            Tất cả
-          </a>,
-          <a className="block" key="violate" href="#/reviews/violations">
-            Đánh giá vi phạm
-          </a>,
-          <a className="block" key="deleted" href="#/reviews/deleted">
-            Đánh giá đã xóa
-          </a>,
-        ]}
-      />
-      <Section
-        title="QUẢN LÝ NGƯỜI DÙNG"
-        items={[
-          <a className="block" key="users-all" href="#/users">
-            Xem thông tin
-          </a>,
-        ]}
-      />
+    <aside className="w-64 flex-shrink-0 bg-slate-900 min-h-screen border-r border-slate-800">
+      <div className="h-16 flex items-center px-6 bg-slate-900 border-b border-slate-800">
+         {/* Logo area */}
+         <div className="flex items-center gap-2 font-bold text-xl text-white tracking-tight">
+            <div className="w-8 h-8 rounded bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white">
+                <Store size={18} />
+            </div>
+            <span>FoodAdmin</span>
+         </div>
+      </div>
+
+      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        {/* Dashboard / Overview if we had one, for now linking Home */}
+        <SidebarItem href="#/" icon={LayoutDashboard} label="Tổng quan" />
+
+        <Section title="Nhà Hàng">
+          <SidebarItem href="#/restaurants" icon={Store} label="Tất cả nhà hàng" />
+          <SidebarItem href="#/categories" icon={List} label="Danh mục món ăn" />
+        </Section>
+
+        <Section title="Đánh Giá">
+          <SidebarItem href="#/reviews" icon={MessageSquare} label="Tất cả đánh giá" />
+          <SidebarItem href="#/reviews/violations" icon={AlertTriangle} label="Báo cáo vi phạm" />
+          <SidebarItem href="#/reviews/deleted" icon={Trash2} label="Đã xóa" />
+        </Section>
+
+        <Section title="Hệ Thống">
+          <SidebarItem href="#/users" icon={Users} label="Người dùng" />
+        </Section>
+      </nav>
+      
+      <div className="p-4 border-t border-slate-800">
+        <div className="flex items-center gap-3">
+             <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs text-white font-medium">
+                AD
+             </div>
+             <div className="text-sm">
+                <p className="text-white font-medium">Admin User</p>
+                <p className="text-slate-500 text-xs">admin@example.com</p>
+             </div>
+        </div>
+      </div>
     </aside>
   );
 }

@@ -1,39 +1,42 @@
 import React from "react";
-import logo from "../assets/logo.png";
+import { Bell, Search, Menu } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="flex items-center justify-between bg-sky-400 h-16 px-6 shadow-sm">
+    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 sticky top-0 z-10">
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center overflow-hidden">
-          <img src={logo} alt="logo" className="w-full h-full object-contain" />
-        </div>
-        <div className="text-lg sm:text-xl lg:text-2xl font-extrabold tracking-wider">
-          TRANG QUẢN LÝ
-        </div>
+        <button className="lg:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md">
+           <Menu size={20} />
+        </button>
+        {/* Breadcrumb or Title placeholder */}
+        <h1 className="text-xl font-bold text-gray-800 hidden sm:block">
+           Dashboard
+        </h1>
       </div>
 
-      <div className="flex items-center gap-6">
-        <div className="flex items-center gap-3">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-6 h-6 text-sky-900"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5.121 17.804A13.937 13.937 0 0112 15c2.485 0 4.797.633 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-          </svg>
-          <span className="font-semibold text-sm">TRUONG SON</span>
+      <div className="flex items-center gap-4">
+        {/* Search Bar - hidden on small screens */}
+        <div className="hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-1.5 w-64 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-transparent transition-all">
+          <Search size={16} className="text-gray-400" />
+          <input 
+            type="text" 
+            placeholder="Search..." 
+            className="ml-2 bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder-gray-400"
+          />
         </div>
-        <button className="text-sm font-semibold text-sky-900">
-          ĐĂNG XUẤT
+
+        <button className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors relative">
+          <Bell size={20} />
+          <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
         </button>
+
+        <div className="h-8 w-px bg-gray-200 mx-1"></div>
+
+        <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm">
+                TS
+            </div>
+        </div>
       </div>
     </header>
   );

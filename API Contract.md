@@ -29,3 +29,18 @@ GET /api/admin/about/contact: Lấy danh sách liên hệ (Admin).
 
 ## System
 GET /api/health: Kiểm tra trạng thái server.
+
+
+
+
+
+
+Các thư viện để tạo FE cho Admin
+Để tạo giao diện Admin chuyên nghiệp hiện tại, mình đã sử dụng kết hợp các công nghệ sau:
+
+React (v18): Thư viện cốt lõi để xây dựng giao diện người dùng (đã có sẵn trong dự án).
+Tailwind CSS (v4): Framework CSS ưu tiên tiện ích (utility-first) phiên bản mới nhất. Giúp thiết kế nhanh, nhất quán và dễ tùy chỉnh chủ đề (theme).
+Sử dụng @tailwindcss/postcss để tích hợp với quy trình build.
+Lucide React: Bộ icon hiện đại, nhẹ và rất đẹp (thay thế cho các icon cũ hoặc SVG thủ công). Đây là thư viện mình đã cài thêm.
+Font Inter (Google Fonts): Phông chữ sans-serif hiện đại, rất phổ biến cho các giao diện dashboard/admin nhờ tính dễ đọc và sạch sẽ.
+Vite: Công cụ build tool siêu tốc (đã có sẵn).
