@@ -30,26 +30,35 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6 bg-white min-h-[calc(100vh-4rem)]">
-          {route.name === "restaurants" ? (
-            <Restaurants />
-          ) : route.name === "categories" ? (
-            <Categories />
-          ) : route.name === "reviews" ? (
-            <Reviews />
-          ) : route.name === "review-violations" ? (
-            <ReviewViolations />
-          ) : route.name === "reviews-deleted" ? (
-            <ReviewsDeleted />
-          ) : route.name === "users" ? (
-            <Users />
-          ) : (
-            <div />
-          )}
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Sidebar - fixed width */}
+      <Sidebar />
+      
+      {/* Main Content Area - fluid width */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <Header />
+        
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
+            {route.name === "restaurants" ? (
+              <Restaurants />
+            ) : route.name === "categories" ? (
+              <Categories />
+            ) : route.name === "reviews" ? (
+              <Reviews />
+            ) : route.name === "review-violations" ? (
+              <ReviewViolations />
+            ) : route.name === "reviews-deleted" ? (
+              <ReviewsDeleted />
+            ) : route.name === "users" ? (
+              <Users />
+            ) : (
+              <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-slate-700">Chào mừng trở lại!</h2>
+                <p className="text-slate-500 mt-2">Chọn một mục từ menu bên trái để bắt đầu quản lý.</p>
+              </div>
+            )}
+          </div>
         </main>
       </div>
     </div>

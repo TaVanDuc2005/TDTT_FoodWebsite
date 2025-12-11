@@ -1,11 +1,27 @@
 import React, { useState, useEffect } from "react";
 import RestaurantDetail from "../components/RestaurantDetail";
 import AddRestaurantForm from "../components/AddRestaurantForm";
+import { 
+  Plus, 
+  RefreshCw, 
+  Search, 
+  MoreHorizontal, 
+  Edit3, 
+  EyeOff, 
+  Trash,
+  Store,
+  Star
+} from "lucide-react";
 
-const StatCard = ({ title, value }) => (
-  <div className="w-56 h-40 bg-sky-100 rounded-lg border border-sky-300 flex flex-col items-center justify-center">
-    <div className="text-lg font-semibold mb-2">{title}</div>
-    <div className="text-4xl font-extrabold">{value}</div>
+const StatCard = ({ title, value, icon: Icon, color }) => (
+  <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
+    <div>
+      <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
+      <h3 className="text-2xl font-bold text-slate-800">{value}</h3>
+    </div>
+    <div className={`p-3 rounded-lg ${color}`}>
+      <Icon className="w-6 h-6 text-white" />
+    </div>
   </div>
 );
 
@@ -16,67 +32,68 @@ const Row = ({ item, onOpen, onEdit, onHide, onDelete }) => {
         .map((t) => t.trim())
         .filter(Boolean).length
     : 0;
-  const status =
-    item.visible === false
-      ? { text: "Bị ẩn", color: "bg-gray-400 text-gray-900" }
-      : { text: "Hiển thị", color: "bg-emerald-200 text-emerald-800" };
+  const isVisible = item.visible !== false;
+
   return (
-    <tr className="border-t hover:bg-slate-50">
-      <td className="p-4 w-28 cursor-pointer" onClick={() => onOpen(item)}>
-        <img
-          src={item.image || "/src/assets/logo.png"}
-          alt=""
-          className="w-20 h-20 rounded-lg object-cover"
-        />
+    <tr 
+      className="border-b border-slate-100 hover:bg-slate-50 transition-colors group cursor-pointer"
+      onClick={() => onOpen(item)}
+    >
+      <td className="px-6 py-4">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
+            <img
+              src={item.image || "/src/assets/logo.png"}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div>
+            <div className="font-semibold text-slate-900">{item.name}</div>
+            <div className="text-xs text-slate-500">{item.address || "Chưa cập nhật địa chỉ"}</div>
+          </div>
+        </div>
       </td>
-      <td
-        className="p-4 font-extrabold cursor-pointer"
-        onClick={() => onOpen(item)}
-      >
-        {item.name}
-      </td>
-      <td
-        className="p-4 text-center font-bold cursor-pointer"
-        onClick={() => onOpen(item)}
-      >
-        {tagsCount}
-      </td>
-      <td
-        className="p-4 text-center cursor-pointer"
-        onClick={() => onOpen(item)}
-      >
-        <span className={`px-3 py-1 rounded-full text-sm ${status.color}`}>
-          {status.text}
+      <td className="px-6 py-4 text-center">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+          {tagsCount} danh mục
         </span>
       </td>
-      <td className="p-4 text-right space-x-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit(item);
-          }}
-          className="px-3 py-1 bg-white border rounded hover:bg-gray-50"
-        >
-          Sửa
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onHide(item);
-          }}
-          className="px-3 py-1 bg-amber-200 rounded hover:bg-amber-300"
-        >
-          Ẩn
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(item);
-          }}
-          className="px-3 py-1 bg-pink-400 text-white rounded hover:bg-pink-500"
-        >
-          Xóa
-        </button>
+      <td className="px-6 py-4 text-center">
+         {isVisible ? (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+              Hiển thị
+            </span>
+         ) : (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
+              Đã ẩn
+            </span>
+         )}
+      </td>
+      <td className="px-6 py-4 text-right">
+        <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
+          <button
+            onClick={() => onEdit(item)}
+            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+            title="Sửa"
+          >
+            <Edit3 size={18} />
+          </button>
+          <button
+            onClick={() => onHide(item)}
+            className="p-2 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+            title={isVisible ? "Ẩn" : "Hiện"}
+          >
+            <EyeOff size={18} />
+          </button>
+          <button
+            onClick={() => onDelete(item)}
+            className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+            title="Xóa"
+          >
+            <Trash size={18} />
+          </button>
+        </div>
       </td>
     </tr>
   );
@@ -127,7 +144,6 @@ export default function Restaurants() {
         return created;
       } else {
         const txt = await res.text();
-        console.error("Create failed", txt);
         throw new Error(txt || "Create failed");
       }
     } catch (err) {
@@ -220,122 +236,147 @@ export default function Restaurants() {
     }
   }
 
+  const filteredRestaurants = restaurants.filter((r) =>
+    r.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div>
-      <div className="px-6 py-4 border-b bg-sky-200 text-slate-800">
-        Quản lý nhà hàng &nbsp; &gt; &nbsp; Tất cả
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-800">Tất cả nhà hàng</h2>
+          <p className="text-slate-500 mt-1">Quản lý danh sách nhà hàng và đối tác của bạn.</p>
+        </div>
+        <div className="flex items-center gap-3">
+            <button
+                onClick={fetchRestaurants}
+                className="p-2 text-slate-500 hover:text-slate-700 hover:bg-white rounded-lg border border-transparent hover:border-slate-200 transition-all"
+                title="Tải lại"
+            >
+                <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
+            </button>
+            <button
+                onClick={() => setShowAdd(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm shadow-indigo-200"
+            >
+                <Plus size={20} />
+                Thêm nhà hàng
+            </button>
+        </div>
       </div>
 
-      <div className="p-6">
-        <div className="mb-6 flex items-center gap-4">
-          <button
-            onClick={() => setShowAdd(true)}
-            className="px-3 py-2 border rounded-lg bg-sky-50"
-          >
-            + Thêm nhà hàng mới
-          </button>
-          <button
-            onClick={fetchRestaurants}
-            className="px-3 py-2 border rounded-lg bg-white"
-            disabled={loading}
-          >
-            {loading ? "Đang tải..." : "Tải lại"}
-          </button>
-          <div className="flex-1" />
-          <input
-            type="text"
-            placeholder="Tìm kiếm theo tên nhà hàng..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-4 py-2 border rounded-lg w-80"
-          />
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard 
+            title="Tổng nhà hàng" 
+            value={restaurants.length} 
+            icon={Store} 
+            color="bg-indigo-500" 
+        />
+        <StatCard
+            title="Tổng đánh giá"
+            value={restaurants
+            .filter((r) => r.rating !== null && r.rating !== undefined)
+            .reduce((sum, r) => sum + (Number(r.rating) || 0), 0)
+            .toFixed(1)}
+            icon={Star}
+            color="bg-amber-500"
+        />
+        <StatCard 
+            title="Hoạt động" 
+            value={restaurants.filter(r => r.visible !== false).length} 
+            icon={Store} 
+            color="bg-emerald-500" 
+        />
+      </div>
+
+      {/* Main Content */}
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        {/* Toolbar */}
+        <div className="p-4 border-b border-slate-100 flex flex-col sm:flex-row gap-4 justify-between items-center bg-white">
+            <div className="relative w-full sm:w-80">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                    type="text"
+                    placeholder="Tìm kiếm nhà hàng..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                />
+            </div>
+            {/* Filter Placeholder - could add dropdowns here */}
         </div>
-
-        <div className="grid grid-cols-3 gap-6 mb-6">
-          <div />
-          <div className="flex justify-center">
-            <StatCard title="Tổng nhà hàng" value={restaurants.length} />
-          </div>
-          <div className="flex justify-center">
-            <StatCard
-              title="Tổng đánh giá"
-              value={restaurants
-                .filter((r) => r.rating !== null && r.rating !== undefined)
-                .reduce((sum, r) => sum + (Number(r.rating) || 0), 0)
-                .toFixed(1)}
-            />
-          </div>
-        </div>
-
-        {selectedForEdit && (
-          <RestaurantDetail
-            item={selectedForEdit}
-            onClose={() => setSelectedForEdit(null)}
-            inline
-            isEdit={true}
-            onSave={handleUpdate}
-          />
-        )}
-
-        {selected && !selectedForEdit && (
-          <RestaurantDetail
-            item={selected}
-            onClose={() => setSelected(null)}
-            inline
-          />
-        )}
-
+        
+        {/* Error Banners */}
         {actionError && (
-          <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+          <div className="mx-4 mt-4 p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg flex items-center gap-2">
+            <AlertTriangle size={20} />
             {actionError}
           </div>
         )}
+        {error && (
+            <div className="mx-4 mt-4 p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-lg">
+                Lỗi tải dữ liệu: {error}
+            </div>
+        )}
 
-        <div className="overflow-hidden border rounded-lg">
-          {error && (
-            <div className="p-4 text-red-600">Lỗi khi tải dữ liệu: {error}</div>
-          )}
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-sky-200 text-slate-800">
-                <th className="p-4">Hình ảnh</th>
-                <th className="p-4">Thông tin nhà hàng</th>
-                <th className="p-4 text-center">Số danh mục</th>
-                <th className="p-4 text-center">Trạng thái</th>
-                <th className="p-4">Thao tác</th>
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th className="px-6 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Thông tin</th>
+                <th className="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Danh mục</th>
+                <th className="px-6 py-3 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Trạng thái</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Thao tác</th>
               </tr>
             </thead>
-            <tbody>
-              {restaurants
-                .filter((r) =>
-                  r.name.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map((s) => (
-                  <Row
-                    key={s.id}
-                    item={s}
-                    onOpen={(it) => setSelected(it)}
-                    onEdit={(it) => setSelectedForEdit(it)}
-                    onHide={handleHide}
-                    onDelete={handleDelete}
-                  />
-                ))}
-              {!loading &&
-                restaurants.filter((r) =>
-                  r.name.toLowerCase().includes(searchQuery.toLowerCase())
-                ).length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="p-6 text-center text-slate-500">
-                      {searchQuery
-                        ? `Không tìm thấy nhà hàng với từ khóa "${searchQuery}"`
-                        : 'Không có nhà hàng nào. Nhấn "Tải lại" hoặc thêm nhà hàng mới.'}
-                    </td>
-                  </tr>
-                )}
+            <tbody className="divide-y divide-slate-100 text-sm">
+              {filteredRestaurants.map((s) => (
+                <Row
+                  key={s.id}
+                  item={s}
+                  onOpen={(it) => setSelected(it)}
+                  onEdit={(it) => setSelectedForEdit(it)}
+                  onHide={handleHide}
+                  onDelete={handleDelete}
+                />
+              ))}
+              
+              {!loading && filteredRestaurants.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="py-12 text-center text-slate-500 flex flex-col items-center">
+                    <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                        <Store size={32} className="text-slate-400" />
+                    </div>
+                    <p>Không tìm thấy nhà hàng nào.</p>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Modals */}
+      {selectedForEdit && (
+        <RestaurantDetail
+          item={selectedForEdit}
+          onClose={() => setSelectedForEdit(null)}
+          inline
+          isEdit={true}
+          onSave={handleUpdate}
+        />
+      )}
+
+      {selected && !selectedForEdit && (
+        <RestaurantDetail
+          item={selected}
+          onClose={() => setSelected(null)}
+          inline
+        />
+      )}
 
       {showAdd && (
         <AddRestaurantForm
