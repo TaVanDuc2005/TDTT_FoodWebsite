@@ -323,3 +323,338 @@ body {
     .history-img { margin: 0 0 15px 0; }
     .history-info { margin-bottom: 15px; }
 }
+
+
+
+
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa; /* Màu nền xám nhẹ hiện đại */
+    padding: 20px;
+  }
+  
+  /* Cái thẻ chứa form (Card) */
+  .auth-card {
+    background: white;
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 16px; /* Bo góc mềm mại */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* Đổ bóng sang trọng */
+    text-align: center;
+  }
+  
+  /* Tiêu đề */
+  .auth-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .auth-subtitle {
+    color: #666;
+    font-size: 15px;
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+  
+  /* Input đẹp hơn */
+  .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+  }
+  
+  .form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #444;
+    font-size: 14px;
+  }
+  
+  .auth-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+  
+  .auth-input:focus {
+    border-color: #ff6b35; /* Màu Cam thương hiệu (sửa lại nếu bà thích màu khác) */
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+  }
+  
+  /* Nút bấm xịn */
+  .auth-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #ff6b35; /* Màu Cam chủ đạo */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .auth-btn:hover {
+    background-color: #e55a2b; /* Đậm hơn khi hover */
+  }
+  
+  .auth-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Link quay lại */
+  .back-link {
+    display: block;
+    margin-top: 20px;
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  
+  .back-link:hover {
+    color: #ff6b35;
+    text-decoration: underline;
+  }
+  
+  /* Thông báo lỗi/thành công */
+  .alert-box {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: left;
+  }
+  .alert-error {
+    background-color: #ffe5e5;
+    color: #d63031;
+    border: 1px solid #fab1a0;
+  }
+  .alert-success {
+    background-color: #e3f9e5;
+    color: #27ae60;
+    border: 1px solid #a8e6cf;
+  }
+
+  .profile-wrapper {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap; /* Để responsive trên mobile */
+  }
+  
+  /* Card chung cho cả 2 bên */
+  .profile-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    padding: 30px;
+  }
+  
+  /* Cột trái */
+  .sidebar {
+    flex: 1;
+    min-width: 250px;
+    text-align: center;
+    height: fit-content;
+  }
+  
+  /* Cột phải */
+  .content {
+    flex: 2;
+    min-width: 300px;
+  }
+  
+  /* Avatar */
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #fff0e6; /* Viền cam nhạt */
+    margin-bottom: 15px;
+  }
+  
+  .profile-name {
+    margin: 0;
+    color: #333;
+    font-size: 20px;
+  }
+  
+  .profile-email {
+    color: #777;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
+  /* Menu bên trái */
+  .sidebar-menu {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .menu-item {
+    background: none;
+    border: none;
+    padding: 12px;
+    text-align: left;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 8px;
+    color: #555;
+    transition: all 0.2s;
+  }
+  
+  .menu-item:hover {
+    background-color: #f8f9fa;
+    color: #ff6b35;
+  }
+  
+  .menu-item.active {
+    background-color: #fff0e6;
+    color: #ff6b35;
+    font-weight: 600;
+  }
+  
+  .logout-btn {
+    color: #d63031 !important;
+    border-top: 1px solid #eee;
+    margin-top: 10px;
+  }
+  .logout-btn:hover {
+    background-color: #ffe5e5 !important;
+  }
+  
+  /* Form chỉnh sửa */
+  .section-title {
+    font-size: 22px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    color: #333;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Chia 2 cột */
+    gap: 20px;
+  }
+  
+  /* Input bị disable */
+  .auth-input.disabled {
+    background-color: #f0f0f0;
+    color: #888;
+    cursor: not-allowed;
+  }
+  
+  /* Responsive: Màn hình nhỏ thì input thành 1 cột */
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+
+
+/* CSS cho trang Tìm kiếm nâng cao */
+
+
+  /* Header giống trang Tất cả nhà hàng */
+.restaurants-header {
+  margin: 24px 0 16px;
+}
+
+.restaurants-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.restaurants-subtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Form search nâng cao */
+.search-form-advanced {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.search-input-advanced {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid #ddd;
+  outline: none;
+}
+
+.search-input-advanced:focus {
+  border-color: #5a6cff;
+}
+
+.search-button-advanced {
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: none;
+  background: #5a6cff;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Grid card – nếu bạn đã có class .restaurant-grid thì không cần sửa */
+.restaurant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+/* Pagination giống hình */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 40px;
+}
+
+.page-btn {
+  min-width: 40px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.page-btn.active {
+  background: #5a6cff;
+  color: #fff;
+  border-color: #5a6cff;
+}
+
+.page-dots {
+  padding: 0 4px;
+  color: #999;
+}

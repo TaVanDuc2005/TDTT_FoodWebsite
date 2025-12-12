@@ -7,6 +7,9 @@ import { auth, googleProvider } from "../../firebaseConfig";
 
 import logoImg from "../../assets/logo.svg";
 
+// ✅ Import useAuth để sử dụng login từ AuthContext
+import { useAuth } from "../../context/AuthContext";
+
 const API_BASE_URL = "http://localhost:5000/api";
 
 function SignInPage() {
@@ -18,7 +21,12 @@ function SignInPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [pendingAuth, setPendingAuth] = useState(null); // Store auth data temporarily
   const navigate = useNavigate();
+
+  // ✅ Lấy hàm login từ AuthContext
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, type, checked, value } = e.target;
@@ -46,18 +54,22 @@ function SignInPage() {
       });
 
       const data = await res.json();
-
+      
       if (!res.ok) {
         throw new Error(data.message || "Đăng nhập thất bại");
       }
 
-      localStorage.setItem(
-        "auth",
-        JSON.stringify({ token: data.token, user: data.user })
-      );
-
-      navigate("/");
+      // Check role
+      if (data.user.role === "admin") {
+        setPendingAuth({ user: data.user, token: data.token });
+        setShowAdminModal(true);
+      } else {
+        // Only login immediately if not admin (or if we want direct redirect)
+        login(data.user, data.token);
+        navigate("/");
+      }
     } catch (err) {
+      console.error("Login error:", err);
       setError(err.message || "Có lỗi xảy ra");
     } finally {
       setLoading(false);
@@ -87,12 +99,13 @@ function SignInPage() {
         throw new Error(data.message || "Đăng nhập Google thất bại");
       }
 
-      localStorage.setItem(
-        "auth",
-        JSON.stringify({ token: data.token, user: data.user })
-      );
-
-      navigate("/");
+      if (data.user.role === "admin") {
+        setPendingAuth({ user: data.user, token: data.token });
+        setShowAdminModal(true);
+      } else {
+        login(data.user, data.token);
+        navigate("/");
+      }
     } catch (err) {
       console.error("Google login error:", err);
       setError(err.message || "Đăng nhập Google thất bại");
@@ -103,6 +116,87 @@ function SignInPage() {
 
   return (
     <div className="auth-body">
+      {/* Admin Choice Modal */}
+      {showAdminModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              maxWidth: "400px",
+              width: "90%",
+              textAlign: "center",
+              boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h3 style={{ marginTop: 0, color: "#333" }}>Chào mừng Admin</h3>
+            <p style={{ color: "#666", margin: "15px 0" }}>
+              Bạn muốn vào Trang Admin hay dùng Web như User?
+            </p>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+              }}
+            >
+              <button
+                onClick={() => {
+                  if (pendingAuth) {
+                    login(pendingAuth.user, pendingAuth.token);
+                  }
+                  window.location.href = "http://localhost:5174";
+                }}
+                style={{
+                  padding: "10px",
+                  backgroundColor: "#ff6600",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontWeight: "bold",
+                }}
+              >
+                Vào Trang Admin
+              </button>
+              <button
+                onClick={() => {
+                  if (pendingAuth) {
+                    login(pendingAuth.user, pendingAuth.token);
+                  }
+                  setShowAdminModal(false);
+                  navigate("/");
+                }}
+                style={{
+                  padding: "10px",
+                  backgroundColor: "#f0f0f0",
+                  color: "#333",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Dùng Web như User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="auth-page-label">Sign in</div>
 
       <div className="auth-wrapper signin-mode">

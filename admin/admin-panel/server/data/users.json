@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "name": "NGUYEN",
+    "email": "nguyen@example.com",
+    "avatar": "https://via.placeholder.com/100",
+    "role": "user",
+    "status": "banned",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "name": "SON",
+    "email": "son@example.com",
+    "avatar": "https://via.placeholder.com/100",
+    "role": "user",
+    "status": "active",
+    "createdAt": "2025-01-02T00:00:00.000Z"
+  },
+  {
+    "id": 3,
+    "name": "KIET",
+    "email": "kiet@example.com",
+    "avatar": "https://via.placeholder.com/100",
+    "role": "user",
+    "status": "active",
+    "createdAt": "2025-01-03T00:00:00.000Z"
+  },
+  {
+    "id": 4,
+    "name": "LONG",
+    "email": "long@example.com",
+    "avatar": "https://via.placeholder.com/100",
+    "role": "user",
+    "status": "active",
+    "createdAt": "2025-01-04T00:00:00.000Z"
+  },
+  {
+    "id": 5,
+    "name": "DUC",
+    "email": "duc@example.com",
+    "avatar": "https://via.placeholder.com/100",
+    "role": "user",
+    "status": "active",
+    "createdAt": "2025-01-05T00:00:00.000Z"
+  },
+  {
+    "id": 6,
+    "name": "HOC",
+    "email": "hoc@example.com",
+    "avatar": "https://via.placeholder.com/100",
+    "role": "user",
+    "status": "active",
+    "createdAt": "2025-01-06T00:00:00.000Z"
+  }
+]
